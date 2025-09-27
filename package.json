@@ -1,0 +1,30 @@
+{
+  "name": "test-automation-portfolio",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CessyIntet/Test-Automation-Portfolio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CessyIntet/Test-Automation-Portfolio/issues"
+  },
+  "homepage": "https://github.com/CessyIntet/Test-Automation-Portfolio#readme",
+  "description": "",
+  "devDependencies": {
+    "@playwright/test": "^1.55.1",
+    "@types/node": "^24.5.2",
+    "@estruyf/github-actions-reporter": "^1.10.0",
+    "@faker-js/faker": "^9.5.0","@types/js-yaml": "^4.0.9",
+    "chrome-launcher": "^1.2.0",
+    "dotenv": "^16.6.1",
+    "js-yaml": "^4.1.0",
+    "lighthouse": "^12.8.1",
+    "playwright-html": "1.2.5",
+    "pw-api-plugin": "^2.0.2"
+  }
+}
