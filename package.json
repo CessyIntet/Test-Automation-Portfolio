@@ -2,7 +2,9 @@
   "name": "test-automation-portfolio",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "homepage-ui": "npx playwright test tests/ui-validation/homepage-ui.spec.ts"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CessyIntet/Test-Automation-Portfolio.git"
