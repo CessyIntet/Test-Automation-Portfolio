@@ -1,1 +1,1 @@
-Parabank Website Test Automation Project
+Saucedemo Website Test Automation Project

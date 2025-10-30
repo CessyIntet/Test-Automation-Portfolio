@@ -1,22 +1,23 @@
 
 import { test, expect } from '../../shared/base';
 import { attachScreenshot } from '../../shared/helpers.ts';
+import customer from '../../test-data/users.json';
 
 const LOGIN_SUCCESS_SCREENSHOT = 'login-success-screenshot.png';
 const LOGIN_FAILURE_SCREENSHOT = 'login-failure-screenshot.png';
-const LOGIN_ERROR_MESSAGE = 
-  'Epic sadface: Username and password do not match any user in this service';
-const LOGIN_MISSING_PASSWORD = 
-  'Epic sadface: Password is required';
+const LOGOUT_SUCCESS_SCREENSHOT = 'logout-success-screenshot.png';
+const LOGOUT_GOBACK_SCREENSHOT = 'logout-goback-screenshot.png';
+const CHECKOUTURL_ERROR_SCREENSHOT = 'checkouturl-error-screenshot.png';
 
- test.describe('Login Test Suite', { tag: [ '@Regression-Testing', '@Smoke-Testing', "@Sprint-1"] }, () => {
+
+//---------------Focus: verifying successful login behavior for one or multiple users-----------------
+
+ test.describe('Authentication Tests', { tag: [ "@HappyPath"] }, () => {
   test.beforeEach(async ({ LoginPage }) => {
-    await LoginPage.navigateTo();
-    });
-  
+    await LoginPage.navigateTo();});
 
 
-    test('Should Successfully login - POM Modular', async ({ LoginPage, page }, testInfo) => {
+    test('Should successfully log in with valid credentials', {tag: "@Smoke"}, async ({ LoginPage, page }, testInfo) => {
       await test.step('Input Username', async () => {
         await LoginPage.InputUsername(process.env.SAUCEDEMO_USERNAME!);
       });
@@ -26,8 +27,35 @@ const LOGIN_MISSING_PASSWORD =
       await test.step('Click Login Button', async () => {
         await LoginPage.ClickLoginButton();
       });
-      await test.step('Verify visibility & text Swag Labs', async () => {
+      await test.step("Verify URL and visibility of 'Swag Labs'", async () => {
+        
+        await expect(page.url()).toBe('https://www.saucedemo.com/inventory.html');
         await expect(page.getByText('Swag Labs')).toBeVisible();
+
+      });
+      await test.step('Attach screenshot of successful login', async () => {
+        await attachScreenshot(
+          LoginPage.page,testInfo,LOGIN_SUCCESS_SCREENSHOT,);    
+      });
+    });
+
+    
+    test('Should allow all 6 valid users to log in successfully', {tag: "@Regression" }, async ({ LoginPage, page }, testInfo) => {
+      
+      const user = customer[1]; // select a user from the users.json file
+      
+      await test.step("Login with invalid credentials", async () => {
+        await LoginPage.login(user.username, user.password);
+      });
+
+      await test.step('Click Login Button', async () => {
+        await LoginPage.ClickLoginButton();
+      });
+      await test.step("Verify URL and visibility of 'Swag Labs'", async () => {
+        
+        await expect(page.url()).toBe('https://www.saucedemo.com/');
+        await expect(page.getByText('Swag Labs')).toBeVisible();
+
       });
       await test.step('Attach screenshot of successful login', async () => {
         await attachScreenshot(
@@ -36,10 +64,24 @@ const LOGIN_MISSING_PASSWORD =
       });
     });
 
+});
 
-    test("should unsuccessfully login with invalid credentials", {tag: "@Negative-Testing"}, async ({ page, LoginPage }, testInfo) => {
+
+
+
+//---------------Focus: verifying proper error handling and validation during login-----------------
+
+ test.describe('Negative Login Tests', { tag: [ '@Negative-Testing', '@Security'] }, () => {
+  test.beforeEach(async ({ LoginPage }) => {
+    await LoginPage.navigateTo();});
+
+    test("Should display an error message for invalid credentials", async ({ page, LoginPage }, testInfo) => {
+      
+      const invalidUser = customer[6];
+
       await test.step("Login with invalid credentials", async () => {
-        await LoginPage.login('invalid_user', 'invalid_password');
+
+        await LoginPage.login(invalidUser.username, invalidUser.password);
       });
       
       await test.step("Verify  visibility of login error message", async () => {
@@ -47,15 +89,11 @@ const LOGIN_MISSING_PASSWORD =
       });
 
       await test.step("Take and attach screenshot of error", async () => {
-        await attachScreenshot(
-          page,
-          testInfo,
-          LOGIN_FAILURE_SCREENSHOT
-          );
+        await attachScreenshot(page,testInfo,LOGIN_FAILURE_SCREENSHOT);
       });
     });
 
-      test("Failed login due to missing password-Should show error message", {tag: "@Negative-Testing"}, async ({ page, LoginPage }, testInfo) => {
+      test("Should display an error message when password field is empty", async ({ page, LoginPage }, testInfo) => {
       
         await test.step('Input Username', async () => {
           await LoginPage.InputUsername(process.env.SAUCEDEMO_USERNAME!);
@@ -72,10 +110,21 @@ const LOGIN_MISSING_PASSWORD =
         });
     });
 
-    test("Verifies successful logout after a valid login", {tag: "@HappyPath"}, async ({ page, LoginPage }, testInfo) => {
+});
+
+
+//---------------Focus: verifying logout process, navigation restrictions, and session invalidation-----------------
+
+ test.describe('Logout and Session Management Tests', { tag: [ '@Regression-Testing', '@Smoke-Testing', "@Security"] }, () => {
+  test.beforeEach(async ({ LoginPage }) => {
+    await LoginPage.navigateTo();});
+
+    test("Should successfully log out and redirect to login page", async ({ page, LoginPage }, testInfo) => {
       await test.step("Login with valid credentials", async () => {
         await LoginPage.login(process.env.SAUCEDEMO_USERNAME!, process.env.SAUCEDEMO_PASSWORD!);
       });
+
+      //assertion inside the POM since we just need to bypass the login validation here
       await test.step("Verify login success", async () => {
         await LoginPage.verifyLoginSuccess();
       });
@@ -96,16 +145,18 @@ const LOGIN_MISSING_PASSWORD =
       });
 
       await test.step("Take and attach screenshot", async () => {
-        await attachScreenshot(page,testInfo,LOGIN_SUCCESS_SCREENSHOT
-        );
+        await attachScreenshot(page,testInfo,LOGOUT_SUCCESS_SCREENSHOT);
       });
     });
 
     
-    test("User cannot go back once logged out", {tag: "@HappyPath"}, async ({ page, LoginPage }, testInfo) => {
+    test("Should prevent user from returning to previous page after logout", {tag: "@Navigation"}, async ({ page, LoginPage }, testInfo) => {
       await test.step("Login with valid credentials", async () => {
         await LoginPage.login(process.env.SAUCEDEMO_USERNAME!, process.env.SAUCEDEMO_PASSWORD!);
       });
+
+      //assertion inside the POM since we just need to bypass the login validation here
+      
       await test.step("Verify login success", async () => {
         await LoginPage.verifyLoginSuccess();
       });
@@ -137,26 +188,181 @@ const LOGIN_MISSING_PASSWORD =
           await expect(page.locator('[data-test="error"]')).toContainText('Epic sadface: You can only access \'/inventory.html\' when you are logged in.');
         });
 
-      await test.step("Take and attach screenshot", async () => {
-        await attachScreenshot(page,testInfo,LOGIN_SUCCESS_SCREENSHOT);
-      });
+        await test.step("Take and attach screenshot of goback error", async () => {
+          await attachScreenshot(page,testInfo,LOGOUT_GOBACK_SCREENSHOT);
+         }); 
+
     });
+
+
     
+    test("User cannot access checkout page one by pasting URL after logout", {tag: "@accessControl"}, async ({ page, LoginPage }, testInfo) => {
+      await test.step("Login with valid credentials", async () => {
+        await LoginPage.login(process.env.SAUCEDEMO_USERNAME!, process.env.SAUCEDEMO_PASSWORD!);
+      });
+
+      //assertion inside the POM since we just need to bypass the login validation here
+      
+      await test.step("Verify login success", async () => {
+        await LoginPage.verifyLoginSuccess();
+      });
+
+      await test.step("Copy URL of checkout-step-one.html", async () => {
+        await page.goto('https://www.saucedemo.com/checkout-step-one.html');
+      });
+
+      await test.step("Verify visibility of check out form fields ", async () => {
+        await page.locator('[data-test="firstName"]').isVisible();
+        await page.locator('[data-test="lastName"]').isVisible();
+        await page.locator('[data-test="postalCode"]').isVisible();
+      });
+
+      await test.step("Click Log Out", async () => {
+        await page.getByRole('button', { name: 'Open Menu' }).click();
+        await page.locator('[data-test="logout-sidebar-link"]').click();
+      });
+
+      await test.step("Copy URL of checkout-step-one.html", async () => {
+        await page.goto('https://www.saucedemo.com/checkout-step-one.html');
+      });
+
+      await test.step("Verify error message", async () => {
+        await expect(page.locator('[data-test="error"]')).toContainText('Epic sadface: You can only access \'/checkout-step-one.html\' when you are logged in.');
+      });
+
+
+        await test.step("Take and attach screenshot of goback error", async () => {
+          await attachScreenshot(page,testInfo,CHECKOUTURL_ERROR_SCREENSHOT);
+         }); 
+
+    });
+
+    
+    
+    test("User cannot access checkout page two by pasting URL after logout", {tag: "@accessControl"}, async ({ page, LoginPage }, testInfo) => {
+      await test.step("Login with valid credentials", async () => {
+        await LoginPage.login(process.env.SAUCEDEMO_USERNAME!, process.env.SAUCEDEMO_PASSWORD!);
+      });
+
+      //assertion inside the POM since we just need to bypass the login validation here
+      
+      await test.step("Verify login success", async () => {
+        await LoginPage.verifyLoginSuccess();
+      });
+
+      await test.step("Copy URL of checkout-step-two.html", async () => {
+        await page.goto('https://www.saucedemo.com/checkout-step-two.html');
+      });
+
+       await test.step('Verify visibility of check out step two page', async () => {
+                await expect(page.locator('[data-test="title"]')).toBeVisible();
+              });
+
+      await test.step("Click Log Out", async () => {
+        await page.getByRole('button', { name: 'Open Menu' }).click();
+        await page.locator('[data-test="logout-sidebar-link"]').click();
+      });
+
+      await test.step("Copy URL of checkout-step-two.html", async () => {
+        await page.goto('https://www.saucedemo.com/checkout-step-two.html');
+      });
+
+      await test.step("Verify error message", async () => {
+        await expect(page.locator('[data-test="error"]')).toContainText('Epic sadface: You can only access \'/checkout-step-two.html\' when you are logged in.');
+      });
+
+
+        await test.step("Take and attach screenshot of goback error", async () => {
+          await attachScreenshot(page,testInfo,CHECKOUTURL_ERROR_SCREENSHOT);
+         }); 
+
+    });
+
+
+    
+    
+    test("User cannot access checkout complete page by pasting URL after logout", {tag: "@accessControl"}, async ({ page, LoginPage }, testInfo) => {
+      await test.step("Login with valid credentials", async () => {
+        await LoginPage.login(process.env.SAUCEDEMO_USERNAME!, process.env.SAUCEDEMO_PASSWORD!);
+      });
+
+      //assertion inside the POM since we just need to bypass the login validation here
+      
+      await test.step("Verify login success", async () => {
+        await LoginPage.verifyLoginSuccess();
+      });
+
+      await test.step("Copy URL of checkout complete page", async () => {
+        await page.goto('https://www.saucedemo.com/checkout-complete.html');
+      });
+
+      await test.step("Verify visibility of check out form fields ", async () => {
+        await page.locator('[data-test="firstName"]').isVisible();
+        await page.locator('[data-test="lastName"]').isVisible();
+        await page.locator('[data-test="postalCode"]').isVisible();
+      });
+
+      await test.step("Click Log Out", async () => {
+        await page.getByRole('button', { name: 'Open Menu' }).click();
+        await page.locator('[data-test="logout-sidebar-link"]').click();
+      });
+
+      await test.step("Copy URL of checkout-step-one.html", async () => {
+        await page.goto('https://www.saucedemo.com/checkout-step-one.html');
+      });
+
+      await test.step("Verify error message", async () => {
+        await expect(page.locator('[data-test="error"]')).toContainText('Epic sadface: You can only access \'/checkout-step-one.html\' when you are logged in.');
+      });
+
+
+        await test.step("Take and attach screenshot of goback error", async () => {
+          await attachScreenshot(page,testInfo,CHECKOUTURL_ERROR_SCREENSHOT);
+         }); 
+
+    });
+
+    
+    
+    test("User cannot access cart page by pasting URL after logout", {tag: "@accessControl"}, async ({ page, LoginPage }, testInfo) => {
+      await test.step("Login with valid credentials", async () => {
+        await LoginPage.login(process.env.SAUCEDEMO_USERNAME!, process.env.SAUCEDEMO_PASSWORD!);
+      });
+
+      //assertion inside the POM since we just need to bypass the login validation here
+      
+      await test.step("Verify login success", async () => {
+        await LoginPage.verifyLoginSuccess();
+      });
+
+      await test.step("Copy URL of checkout-step-two.html", async () => {
+        await page.goto('https://www.saucedemo.com/cart.html');
+      });
+
+      await test.step("Verify visibility of check out form fields ", async () => {
+        await page.locator('[data-test="firstName"]').isVisible();
+        await page.locator('[data-test="lastName"]').isVisible();
+        await page.locator('[data-test="postalCode"]').isVisible();
+      });
+
+      await test.step("Click Log Out", async () => {
+        await page.getByRole('button', { name: 'Open Menu' }).click();
+        await page.locator('[data-test="logout-sidebar-link"]').click();
+      });
+
+      await test.step("Copy URL of checkout-step-one.html", async () => {
+        await page.goto('https://www.saucedemo.com/checkout-step-one.html');
+      });
+
+      await test.step("Verify error message", async () => {
+        await expect(page.locator('[data-test="error"]')).toContainText('Epic sadface: You can only access \'/checkout-step-one.html\' when you are logged in.');
+      });
+
+
+        await test.step("Take and attach screenshot of goback error", async () => {
+          await attachScreenshot(page,testInfo,CHECKOUTURL_ERROR_SCREENSHOT);
+         }); 
+
+    });
+
 });
-
-
-//  await expect(page.getByText('Swag Labs')).toBeVisible();
-//    await expect(page.locator('[data-test="error"]')).toBeVisible();
-//    await expect(page.locator('[data-test="error"]')).toContainText('Epic sadface: Username and password do not match any user in this service');
-//    await expect(page.locator('[data-test="error"]')).toContainText('Epic sadface: Password is required');
-
-// go back
-//    await expect(page.locator('[data-test="error"]')).toContainText('Epic sadface: You can only access \'/inventory.html\' when you are logged in.');
-// });
-
-//log out and back
-
-// testInfo.annotations.push({
-//           type: 'bug',
-//           description: 'URL is http://localhost:5173/dashboard after logout',
-//           });
