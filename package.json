@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "homepage-ui": "npx playwright test tests/ui-validation/homepage-ui.spec.ts"
+    "loginpage-ui": "npx playwright test tests/ui-validation/login-ui.spec.ts",
+    "loginpage-test": "npx playwright test tests/features/login.spec.ts"
   },
   "repository": {
     "type": "git",

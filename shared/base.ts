@@ -1,28 +1,35 @@
 import { test as base, request } from '@playwright/test';
+import { InventoryPage } from '../pages/InventoryPage';
 import { LoginPage } from '../pages/LoginPage';
-import { RegistrationPage } from '../pages/RegistrationPage';
-import { DashboardPage } from '../pages/DashboardPage';
+// import { RegistrationPage } from '../pages/RegistrationPage';
+// import { DashboardPage } from '../pages/DashboardPage';
 // import { APIModel } from '../pages/api.model';
 // import { FakeStoreAPI } from '../pages/api-fake-store.model';
 
 type MyFixtures = {
-  loginPage: LoginPage;
-  registrationPage: RegistrationPage;
-  dashboardPage: DashboardPage;
+  InventoryPage: InventoryPage;
+  LoginPage: LoginPage;
+  // registrationPage: RegistrationPage;
+  // dashboardPage: DashboardPage;
 //   apiJsonPlaceholder: APIModel;
 //   fakeStoreAPI: FakeStoreAPI;
 };
 
 export const test = base.extend<MyFixtures>({
-  loginPage: async ({ page }, use) => {
+  InventoryPage: async ({ page }, use) => {
+    await use(new InventoryPage(page));
+  },
+
+
+  LoginPage: async ({ page }, use) => {
     await use(new LoginPage(page));
   },
-  registrationPage: async ({ page }, use) => {
-    await use(new RegistrationPage(page));
-  },
-  dashboardPage: async ({ page }, use) => {
-    await use(new DashboardPage(page));
-  },
+  // registrationPage: async ({ page }, use) => {
+  //   await use(new RegistrationPage(page));
+  // },
+  // dashboardPage: async ({ page }, use) => {
+  //   await use(new DashboardPage(page));
+  // },
 //   apiJsonPlaceholder: async ({}, use) => {
 //     const requestContext = await request.newContext({
 //       baseURL: 'https://jsonplaceholder.typicode.com',
