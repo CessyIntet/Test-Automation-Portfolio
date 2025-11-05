@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "loginpage-ui": "npx playwright test tests/ui-validation/login-ui.spec.ts",
-    "loginpage-test": "npx playwright test tests/features/login.spec.ts"
+    "loginpage-test": "npx playwright test tests/features/login.spec.ts",
+    "inventorypage-test": "npx playwright test tests/features/inventory.spec.ts --ui"
   },
   "repository": {
     "type": "git",
