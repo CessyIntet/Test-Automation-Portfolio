@@ -11,6 +11,15 @@ export class InventoryPage {
     public readonly swaglabsHeader: Locator;
     public readonly errorMessage: Locator;
     public readonly loginContainer: Locator;
+    public readonly SauceLabsBackpackButton: Locator;
+    public readonly shoppingCartLink: Locator;
+    public readonly checkoutButton: Locator;
+    public readonly firstNameInput: Locator;
+    public readonly lastNameInput: Locator;
+    public readonly postalCodeInput: Locator;
+    public readonly finishButton: Locator;
+
+
 
     constructor(public readonly page: Page) {
         this.usernameInput = page.locator('[data-test="username"]');
@@ -19,6 +28,13 @@ export class InventoryPage {
         this.swaglabsHeader = page.getByText('Swag Labs');
         this.errorMessage = page.locator('[data-test="error"]');
         this.loginContainer = page.getByText('Swag Labs');
+        this.SauceLabsBackpackButton = page.locator('[data-test="add-to-cart-sauce-labs-backpack"]');
+        this.shoppingCartLink = page.locator('[data-test="shopping-cart-link"]');
+        this.checkoutButton= page.locator('[data-test="checkout"]');
+        this.firstNameInput = page.locator('[data-test="firstName"]');
+        this.lastNameInput = page.locator('[data-test="lastName"]');
+        this.postalCodeInput = page.locator('[data-test="postalCode"]');
+        this.finishButton = page.locator('[data-test="finish"]');
     }
     //Method 1
 
@@ -99,4 +115,29 @@ export class InventoryPage {
     async ClickLoginButton(): Promise<void> {
         await this.loginButton.click();
     }
+
+    async AddtoCartSauceLabsBackpack(): Promise<void> {
+        await this.SauceLabsBackpackButton.click();
+    }
+
+    async ClickShoppingCart(): Promise<void> {
+        await this.shoppingCartLink.click();
+    }
+
+    async ClickCheckout(): Promise<void> {
+        await this.checkoutButton.click();
+    }
+
+    async inputCustomerDetails(firstName: string, lastName: string, postalCode: string): Promise<void> {
+        await this.firstNameInput.fill(firstName);
+        await this.lastNameInput.fill(lastName);
+        await this.postalCodeInput.fill(postalCode);
+    }
+
+    async ClickFinish(): Promise<void> {
+        await this.finishButton.click();
+    }
+
+
+    
 }

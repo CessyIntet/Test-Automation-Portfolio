@@ -58,9 +58,7 @@ const CHECKOUTURL_ERROR_SCREENSHOT = 'checkouturl-error-screenshot.png';
 
       });
       await test.step('Attach screenshot of successful login', async () => {
-        await attachScreenshot(
-          LoginPage.page,testInfo,LOGIN_SUCCESS_SCREENSHOT,
-        );    
+        await attachScreenshot(LoginPage.page,testInfo,LOGIN_SUCCESS_SCREENSHOT,);    
       });
     });
 
