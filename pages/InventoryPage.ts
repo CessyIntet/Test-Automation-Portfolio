@@ -18,6 +18,9 @@ export class InventoryPage {
     public readonly lastNameInput: Locator;
     public readonly postalCodeInput: Locator;
     public readonly finishButton: Locator;
+    public readonly OpenMenuButton: Locator;
+    public readonly InventorySidebarLink: Locator;
+    public readonly CloseMenuButton: Locator;
 
 
 
@@ -35,6 +38,9 @@ export class InventoryPage {
         this.lastNameInput = page.locator('[data-test="lastName"]');
         this.postalCodeInput = page.locator('[data-test="postalCode"]');
         this.finishButton = page.locator('[data-test="finish"]');
+        this.OpenMenuButton = page.getByRole('button', { name: 'Open Menu' });
+        this.InventorySidebarLink = page.locator('[data-test="inventory-sidebar-link"]');
+        this.CloseMenuButton = page.getByRole('button', { name: 'Close Menu' });
     }
     //Method 1
 
@@ -136,6 +142,18 @@ export class InventoryPage {
 
     async ClickFinish(): Promise<void> {
         await this.finishButton.click();
+    }
+
+    async ClickOpenMenu(): Promise<void> {
+        await this.OpenMenuButton.click();
+    }
+
+    async ClickInventorySidebarLink(): Promise<void> {
+        await this.InventorySidebarLink.click();
+    }
+
+    async ClickCloseMenu(): Promise<void> {
+        await this.CloseMenuButton.click();
     }
 
 

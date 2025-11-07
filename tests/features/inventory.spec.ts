@@ -1,7 +1,7 @@
 
 import { test, expect } from '../../shared/base';
 import { attachScreenshot } from '../../shared/helpers.ts';
-import users from '../../test-data/users.json';
+// import users from '../../test-data/users.json';
 import customer from '../../test-data/customers.json';
 import products from '../../test-data/products.json';
 
@@ -10,13 +10,15 @@ const INVENTORY_PAGE_SCREENSHOT = 'inventory-page-screenshot.png';
 const CHECKOUT_SUCCESSFUL_SCREENSHOT = 'checkout-successful-screenshot.png';
 const CART_PAGE_SCREENSHOT = 'cart-page-screenshot.png';
 const ABOUT_PAGE_SCREENSHOT = 'about-page-screenshot.png';
+const EMPTY_CART_CHECKOUT_BEHAVIOR = 'empty-cart-checkout-behavior.png';
+const ERROR_MESSAGE_SCREENSHOT = 'error-message-screenshot.png';
 
  test.describe('Inventory Page Functional Tests', { tag: [ "@HappyPath"] }, () => {
   test.beforeEach(async ({ InventoryPage }) => {
     await InventoryPage.navigateTo();});
 
     
-      test('User can add single item to cart and checkout the item', { tag: '@Cart'}, async ({ InventoryPage, page }, testInfo) => {
+      test('User can add item to cart and checkout the item', { tag: '@Cart'}, async ({ InventoryPage, page }, testInfo) => {
 
         const user = customer[1]; // select a user from the customers.json file
 
@@ -84,17 +86,18 @@ const ABOUT_PAGE_SCREENSHOT = 'about-page-screenshot.png';
           });
 
           await test.step('Verify Thank you for your order!', async () => {
+            await expect(page).toHaveURL('https://www.saucedemo.com/checkout-complete.html');
             await expect(page.locator('[data-test="complete-header"]')).toContainText('Thank you for your order!');
           });
 
-           await test.step("Take and attach screenshot of thank you page", async () => {
-          await attachScreenshot(page,testInfo,CHECKOUT_SUCCESSFUL_SCREENSHOT);
-        });
+          await test.step("Take and attach screenshot of thank you page", async () => {
+            await attachScreenshot(page,testInfo,CHECKOUT_SUCCESSFUL_SCREENSHOT);
+          });
 
       });
 
 
-      test('User can add the item to cart, remove the item, and view the cart page', { tag: '@Cart'}, async ({ InventoryPage, page }, testInfo) => {
+      test('User can successfully remove a previously added item from the cart', { tag: '@Cart'}, async ({ InventoryPage, page }, testInfo) => {
 
           await test.step("Login with invalid credentials", async () => {
             await InventoryPage.login(process.env.SAUCEDEMO_USERNAME!, process.env.SAUCEDEMO_PASSWORD!);
@@ -104,7 +107,6 @@ const ABOUT_PAGE_SCREENSHOT = 'about-page-screenshot.png';
           await test.step('Add to cart Sauce Labs Backpack', async () => {
             await InventoryPage.AddtoCartSauceLabsBackpack();
           });
-
 
           await test.step('Remove item', async () => {
             await page.locator('[data-test="remove-sauce-labs-backpack"]').click();
@@ -151,7 +153,7 @@ const ABOUT_PAGE_SCREENSHOT = 'about-page-screenshot.png';
 
       });
       
-      test('Sort button is working - Alphabetically (Z - A)', { tag: '@Navigation-UI'}, async ({ InventoryPage, page }, testInfo) => {
+      test('User can can successfully sort products - Alphabetically (Z - A)', { tag: '@Navigation-UI'}, async ({ InventoryPage, page }, testInfo) => {
         // const cartItems = page.locator('[data-test="inventory-list"]');
 
           await test.step("Login with invalid credentials", async () => {
@@ -178,7 +180,7 @@ const ABOUT_PAGE_SCREENSHOT = 'about-page-screenshot.png';
 
       });
 
-      test('Sort button is working - Alphabetically (A - Z)', { tag: '@Navigation-UI'}, async ({ InventoryPage, page }, testInfo) => {
+      test('User can can successfully sort products - Alphabetically (A - Z)', { tag: '@Navigation-UI'}, async ({ InventoryPage, page }, testInfo) => {
         // const cartItems = page.locator('[data-test="inventory-list"]');
 
           await test.step("Login with invalid credentials", async () => {
@@ -330,7 +332,45 @@ test.describe('Add to Cart Functionality - Data Driven', () => {
 
 
 
+test.describe('Negative Test Cases - Logged In State', () => {
+  test.beforeEach(async ({ InventoryPage }) => {
+    await InventoryPage.navigateTo();
+});
+      test('User should not be able to proceed to checkout with an empty cart', { tag: ['@Negative'] }, async ({ InventoryPage, page }, testInfo) => {
+
+        testInfo.annotations.push({type: 'issue',description: 'Checkout proceeds even with an empty cart — expected validation missing.'});
+
+        const user = customer[1];
+        
+        await test.step("Login with valid credentials", async () => {
+          await InventoryPage.login(process.env.SAUCEDEMO_USERNAME!, process.env.SAUCEDEMO_PASSWORD!);
+          await InventoryPage.ClickShoppingCart();
+        });
+
+        // Confirm cart is empty
+        await test.step("Confirm cart is empty", async () => {
+          await expect(page.locator('.cart_item')).toHaveCount(0);
+        });
+
+        await test.step("Confirm cart is empty", async () => {
+          await InventoryPage.ClickCheckout();
+        });
+
+        await test.step("Confirm user is not redirected to checkout", async () => {
+          await expect(page).not.toHaveURL('https://www.saucedemo.com/checkout-step-one.html');
+        });
+        
+        await test.step("Take and attach screenshot of cart page", async () => {
+          await attachScreenshot(page, testInfo, EMPTY_CART_CHECKOUT_BEHAVIOR);
+        });
+      });
+
+
+
+});
+
 
           // await expect(page.locator('[data-test="social-twitter"]')).toBeVisible();
           // await expect(page.locator('[data-test="social-facebook"]')).toBeVisible();
           // await expect(page.locator('[data-test="social-linkedin"]')).toBeVisible();
+
