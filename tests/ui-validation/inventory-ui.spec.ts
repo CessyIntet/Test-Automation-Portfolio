@@ -4,7 +4,7 @@ import { test, expect } from '../../shared/base';
 import products from '../../test-data/products.json';
 import { attachScreenshot } from '../../shared/helpers.ts';
 
-
+const INVENTORYPAGE_UI_SCREENSHOT = 'inventorypage-ui-screenshot.png';
 const PRODUCT_INVENTORY_SCREENSHOT = 'product-inventory-screenshot.png';
 const FOOTER_SCREENSHOT = 'footer-screenshot.png';
 const OPEN_MENUITEM_SCREENSHOT = 'open-menuitem-screenshot.png';
@@ -19,36 +19,9 @@ test.describe('Inventory Page - UI Verification', () => {
     await InventoryPage.verifyLoginSuccess();
   });
 
-  // // Loop through each product in products.json
-  // for (const product of products) {
-  //   test(`Should display product: ${product.name} with correct price and image`, { tag: '@UI @Regression' }, async ({ page },testInfo) => {
-
-  //     await test.step(`Verify visibility for ${product.name}, and correct price of ${product.price}`, async () => {
-  //       const productCard = page.locator('div.inventory_item').filter({ hasText: product.name });
-
-  //       await expect(productCard).toBeVisible();
-          
-  //     // Price check (scoped within product card)
-  //     if (product.price) {await expect(productCard.locator('[data-test="inventory-item-price"]')).toHaveText(product.price);
-  //     }
-
-  //     // Add-to-cart button check
-  //     await expect(productCard.locator('button[data-test^="add-to-cart"]')).toBeVisible();
-
-  //     // Image check
-  //     if (product.imageSelector) {
-  //       await expect(page.locator(product.imageSelector)).toBeVisible();
-  //     }
-  //     });
-  //     await test.step("Take and attach screenshot", async () => {
-  //       await attachScreenshot(page,testInfo,PRODUCT_INVENTORY_SCREENSHOT);
-  //     });
-  //   });
-  // }
-
    // Data-driven loop for all products
   for (const product of products) {
-    test.only(`Should display "${product.name}" with correct price, image, and Add to Cart button`,{ tag: ['@UI', '@Regression', '@Inventory'] },async ({ page }, testInfo) => {
+    test(`Should display "${product.name}" with correct price, image, and Add to Cart button`,{ tag: ['@UI', '@Regression', '@Inventory'] },async ({ page }, testInfo) => {
         
         await test.step(`Locate and verify visibility of ${product.name}`, async () => {
           const productCard = page.locator('div.inventory_item').filter({ hasText: product.name });
@@ -73,22 +46,26 @@ test.describe('Inventory Page - UI Verification', () => {
           }
         });
 
+        await test.step('Capture screenshot for reporting', async () => {
+          await attachScreenshot(page, testInfo, PRODUCT_INVENTORY_SCREENSHOT);
+        });
+
         await test.step(`Navigate to product details page for ${product.name}`, async () => {
           await page.locator(product.imageSelector).click();
           await expect(page).toHaveURL(product.productLink);
         });
 
-        await test.step(`Verify product details: name, description, and price for ${product.name}`, async () => {
+        await test.step(`Verify product name for ${product.name}`, async () => {
           await expect(page.locator('[data-test="inventory-item-name"]')).toHaveText(product.name);
-          await expect(page.locator('[data-test="inventory-item-desc"]')).toContainText(product.description);
-          if (product.price) {
-            await expect(page.locator('[data-test="inventory-item-price"]')).toHaveText(product.price);
-          }
+          
         });
 
-        await test.step('Navigate back to inventory page', async () => {
-          await page.goBack();
-          await expect(page).toHaveURL('https://www.saucedemo.com/inventory.html');
+        await test.step(`Verify product description for ${product.name}`, async () => {
+          await expect(page.locator('[data-test="inventory-item-desc"]')).toContainText(product.description);
+        });
+
+        await test.step(`Verify product price for ${product.name}`, async () => {
+          if (product.price) {await expect(page.locator('[data-test="inventory-item-price"]')).toHaveText(product.price);}
         });
 
         await test.step('Capture screenshot for reporting', async () => {
@@ -98,8 +75,6 @@ test.describe('Inventory Page - UI Verification', () => {
     );
   }
 
-
-  
 
   test('Verify visibility of open menu items - Inventory, About Us, Logout, Reset', async ({ InventoryPage, page },testInfo) => {
 
@@ -180,7 +155,7 @@ test.describe('Inventory Page - UI Verification', () => {
   });
 
   
-  test('Test area snapshot after login', async ({ page }, testInfo) => {
+  test('Test aria snapshot for inventory page after login', async ({ page }, testInfo) => {
 
     await test.step('After login, verify aria snapshot of inventory page', async () => {
       await expect(page.locator('[data-test="secondary-header"]')).toMatchAriaSnapshot(`
@@ -245,91 +220,22 @@ test.describe('Inventory Page - UI Verification', () => {
 
     });
 
+     test('Visual testing for inventory page',{tag: "@Happy-Path"}, async ({ InventoryPage, page }, testInfo) => {
+        
+        await test.step('Verify if the Inventory Page uses the same UI', async () => {
+            await expect(page).toHaveScreenshot('Saucedemo-inventory-page-2025-11-09-16-42.png', {maxDiffPixels: 100,threshold: 0.50,animations: 'disabled',});
+        });
+
+        await test.step('Attach screenshot of successful login', async () => {
+            await attachScreenshot(InventoryPage.page, testInfo, INVENTORYPAGE_UI_SCREENSHOT);
+        });
+
+
+
+    });
 
 
 
 
-});
 
-
-
-
-test('test', async ({ page }) => {
-
-  await page.locator('[data-test="item-4-title-link"]').click();
-  await expect(page.getByText('Sauce Labs Backpackcarry.')).toBeVisible();
-  await expect(page.locator('[data-test="inventory-item-price"]')).toBeVisible();
-  await expect(page.locator('[data-test="add-to-cart"]')).toBeVisible();
-  await expect(page.locator('[data-test="item-sauce-labs-backpack-img"]')).toBeVisible();
-
-
-
-  await expect(page.locator('[data-test="back-to-products"]')).toBeVisible();
-  await page.locator('[data-test="back-to-products"]').click();
-  await page.locator('[data-test="item-0-title-link"]').click();
-
-
-  await expect(page.getByText('Sauce Labs Bike LightA red')).toBeVisible();
-  await expect(page.locator('[data-test="inventory-item-price"]')).toBeVisible();
-  await expect(page.locator('[data-test="add-to-cart"]')).toBeVisible();
-  await expect(page.locator('[data-test="back-to-products"]')).toBeVisible();
-  await page.locator('[data-test="back-to-products"]').click();
-  await page.locator('[data-test="item-4-title-link"]').click();
-  await expect(page.locator('[data-test="inventory-item-name"]')).toBeVisible();
-
-  
-  await expect(page.locator('[data-test="inventory-item-name"]')).toContainText('Sauce Labs Backpack');
-  await expect(page.locator('[data-test="inventory-item-desc"]')).toContainText('carry.allTheThings() with the sleek, streamlined Sly Pack that melds uncompromising style with unequaled laptop and tablet protection.');
-  await expect(page.locator('[data-test="item-sauce-labs-backpack-img"]')).toBeVisible();
-  await page.locator('[data-test="back-to-products"]').click();
-  await page.getByText('$29.99').click();
-
-
-  await page.locator('[data-test="add-to-cart-sauce-labs-backpack"]').click();
-  await page.locator('[data-test="item-4-title-link"]').click();
-  await expect(page.locator('[data-test="error"]')).toBeVisible();
-  await expect(page.locator('[data-test="error"]')).toContainText('Epic sadface: You can only access \'/inventory-item.html\' when you are logged in.');
-  await page.locator('[data-test="username"]').click();
-  await page.locator('[data-test="username"]').fill('standard_user');
-  await page.locator('[data-test="username"]').press('Tab');
-  await page.locator('[data-test="password"]').fill('secret_sauce');
-  await page.locator('[data-test="login-button"]').click();
-  await page.locator('[data-test="item-0-title-link"]').click();
-
-
-  await expect(page.locator('[data-test="inventory-item-name"]')).toContainText('Sauce Labs Bike Light');
-  await expect(page.locator('[data-test="inventory-item-price"]')).toContainText('$9.99');
-  await expect(page.locator('[data-test="inventory-item-desc"]')).toContainText('A red light isn\'t the desired state in testing but it sure helps when riding your bike at night. Water-resistant with 3 lighting modes, 1 AAA battery included.');
-  await page.goto('https://www.saucedemo.com/inventory.html');
-  await page.locator('[data-test="item-1-title-link"]').click();
-
-
-  await expect(page.locator('[data-test="inventory-item-name"]')).toContainText('Sauce Labs Bolt T-Shirt');
-  await expect(page.locator('[data-test="inventory-item-price"]')).toContainText('$15.99');
-  await expect(page.locator('[data-test="item-sauce-labs-bolt-t-shirt-img"]')).toBeVisible();
-  await page.goto('https://www.saucedemo.com/inventory.html');
-  await page.locator('[data-test="item-5-title-link"]').click();
-
-
-  await expect(page.locator('[data-test="inventory-item-name"]')).toContainText('Sauce Labs Fleece Jacket');
-  await expect(page.locator('[data-test="inventory-item-desc"]')).toContainText('It\'s not every day that you come across a midweight quarter-zip fleece jacket capable of handling everything from a relaxing day outdoors to a busy day at the office.');
-  await expect(page.locator('[data-test="inventory-item-price"]')).toContainText('$49.99');
-  await expect(page.locator('[data-test="item-sauce-labs-fleece-jacket-img"]')).toBeVisible();
-  await page.goto('https://www.saucedemo.com/inventory.html');
-  await page.locator('[data-test="item-2-title-link"]').click();
-
-
-  await expect(page.locator('[data-test="inventory-item-name"]')).toContainText('Sauce Labs Onesie');
-  await expect(page.locator('[data-test="inventory-item-desc"]')).toContainText('Rib snap infant onesie for the junior automation engineer in development. Reinforced 3-snap bottom closure, two-needle hemmed sleeved and bottom won\'t unravel.');
-  await expect(page.locator('[data-test="inventory-item-price"]')).toContainText('$7.99');
-  await expect(page.locator('[data-test="item-sauce-labs-onesie-img"]')).toBeVisible();
-  await page.goto('https://www.saucedemo.com/inventory.html');
-  await page.locator('[data-test="item-3-title-link"]').click();
-
-
-  await expect(page.locator('[data-test="inventory-item-name"]')).toContainText('Test.allTheThings() T-Shirt (Red)');
-  await expect(page.locator('[data-test="inventory-item-desc"]')).toContainText('This classic Sauce Labs t-shirt is perfect to wear when cozying up to your keyboard to automate a few tests. Super-soft and comfy ringspun combed cotton.');
-  await expect(page.locator('[data-test="inventory-item-price"]')).toContainText('$15.99');
-  await expect(page.locator('[data-test="item-test.allthethings()-t-shirt-(red)-img"]')).toBeVisible();
-  await page.goto('https://www.saucedemo.com/inventory.html');
 });

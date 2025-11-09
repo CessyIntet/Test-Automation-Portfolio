@@ -12,3 +12,4 @@ node_modules/
 .auth/user.json
 .auth
 features/codegen.spec.ts/
+/lighthouse-report/

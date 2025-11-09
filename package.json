@@ -6,7 +6,8 @@
     "loginpage-ui": "npx playwright test tests/ui-validation/login-ui.spec.ts",
     "loginpage-test": "npx playwright test tests/features/login.spec.ts",
     "inventorypage-test": "npx playwright test tests/features/inventory.spec.ts --ui",
-    "inventorypage-ui": "npx playwright test tests/ui-validation/inventory-ui.spec.ts"
+    "inventorypage-ui": "npx playwright test tests/ui-validation/inventory-ui.spec.ts --ui",
+    "performance-test": "npx playwright test tests/features/performance.spec.ts"
   },
   "repository": {
     "type": "git",
@@ -21,14 +22,15 @@
   "homepage": "https://github.com/CessyIntet/Test-Automation-Portfolio#readme",
   "description": "",
   "devDependencies": {
-    "@playwright/test": "^1.55.1",
-    "@types/node": "^24.5.2",
     "@estruyf/github-actions-reporter": "^1.10.0",
-    "@faker-js/faker": "^9.5.0","@types/js-yaml": "^4.0.9",
-    "chrome-launcher": "^1.2.0",
+    "@faker-js/faker": "^9.5.0",
+    "@playwright/test": "^1.55.1",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^24.5.2",
+    "chrome-launcher": "^1.2.1",
     "dotenv": "^16.6.1",
     "js-yaml": "^4.1.0",
-    "lighthouse": "^12.8.1",
+    "lighthouse": "^12.8.2",
     "playwright-html": "1.2.5",
     "pw-api-plugin": "^2.0.2"
   }
