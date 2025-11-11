@@ -13,3 +13,5 @@ node_modules/
 .auth
 features/codegen.spec.ts/
 /lighthouse-report/
+/allure-results/
+/allure-report/
