@@ -1,16 +1,16 @@
-🧪 SauceDemo Playwright Test Automation Suite
+# 🧪 SauceDemo Playwright Test Automation Suite
 
 Automated end-to-end test suite for the SauceDemo web application, built using Playwright + TypeScript.
 This project demonstrates modern test automation practices such as data-driven testing, custom fixtures, Allure reporting, and Lighthouse performance auditing.
 
-🚀 Project Overview
+# 🚀 Project Overview
 
 This project validates the functional and performance quality of the SauceDemo e-commerce platform.
 It covers major workflows — login, product listing, add-to-cart, and checkout — ensuring both functional correctness and UI consistency.
 
 The test suite is designed for scalability and maintainability using Page Object Model (POM), data-driven testing, and step-based reporting.
 
-🧪 Test Overview
+# 🧪 Test Overview
 
 | Tool / Library              | Purpose                                    |
 | --------------------------- | ------------------------------------------ |
@@ -23,7 +23,7 @@ The test suite is designed for scalability and maintainability using Page Object
 
 
 
-📁 Project Structure
+# 📁 Project Structure
 saucedemo-tests/
 │
 ├── tests/
@@ -53,18 +53,18 @@ saucedemo-tests/
 └── README.md
 
 
-Installation Steps
-# Clone the repository
+# Installation Steps
+1. Clone the repository
 git clone https://github.com/yourusername/saucedemo-playwright.git
 cd saucedemo-playwright
 
-# Install dependencies
+2. Install dependencies
 npm install
 
-# Create .env file for credentials
+3. Create .env file for credentials
 
 
-▶️ How to Run Tests
+# ▶️ How to Run Tests
 
 | Command                      | Description                                                                           |
 | ---------------------------- | ------------------------------------------------------------------------------------- |
@@ -78,7 +78,7 @@ npm install
 🧪 Run All Tests : npx playwright test
 
 
-📊 Test Results & Reports
+# 📊 Test Results & Reports
 
 | Report Type           | Description                                                          | Output Path                                         |
 | --------------------- | -------------------------------------------------------------------- | --------------------------------------------------- |
@@ -86,7 +86,8 @@ npm install
 | **Lighthouse Report** | HTML performance and accessibility audit                             | `./lighthouse-report/custom-lighthouse-report.html` |
 | **Screenshots**       | Captured during test failures or validation steps                    | `./screenshots/`                                    |
 
-🤝 Contributing
+
+# 🤝 Contributing
 Contributions are welcome!
 To contribute:
 
@@ -97,7 +98,7 @@ To contribute:
 5. Create a Pull Request
 
 
-🧩 Troubleshooting
+# 🧩 Troubleshooting
 
 | Issue                           | Possible Cause                        | Solution                                                             |
 | ------------------------------- | ------------------------------------- | -------------------------------------------------------------------- |
